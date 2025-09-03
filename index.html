@@ -15,6 +15,65 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* CSS Variables for themes */
+        :root {
+            --bg-primary: #1e1b4b;
+            --bg-secondary: rgba(0, 0, 0, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: #c4b5fd;
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #3b82f6;
+        }
+
+        /* Dark theme (default) */
+        [data-theme="dark"] {
+            --bg-primary: #1e1b4b;
+            --bg-secondary: rgba(0, 0, 0, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: #c4b5fd;
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #3b82f6;
+        }
+
+        /* Light theme */
+        [data-theme="light"] {
+            --bg-primary: #f8fafc;
+            --bg-secondary: rgba(255, 255, 255, 0.7);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #3b82f6;
+        }
+
+        [data-theme="light"] body {
+            background: linear-gradient(to bottom right, #e0e7ff, #f3e8ff, #fce7f3) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Mystical theme */
+        [data-theme="mystical"] {
+            --bg-primary: #0f0f23;
+            --bg-secondary: rgba(75, 0, 130, 0.3);
+            --text-primary: #ffd700;
+            --text-secondary: #dda0dd;
+            --accent-primary: #ff6347;
+            --accent-secondary: #ffd700;
+        }
+
+        [data-theme="mystical"] body {
+            background: linear-gradient(to bottom right, #0f0f23, #4b0082, #2e0a47) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* Apply theme variables to elements */
+        .bg-black\/30 {
+            background-color: var(--bg-secondary) !important;
+        }
+
+        .text-purple-200 {
+            color: var(--text-secondary) !important;
+        }
+
         body { font-family: 'Inter', sans-serif; }
         
         .card-container {
@@ -109,13 +168,19 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
+<body data-theme="dark" class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white">
     <div class="container mx-auto px-4 py-8">
         <!-- Header -->
         <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-2">
-                CardDraw8 – Random Luck
-            </h1>
+            <div class="flex justify-between items-center mb-4">
+                <div></div> <!-- Spacer for centering -->
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                    CardDraw8 – Random Luck
+                </h1>
+                <button onclick="toggleTheme()" aria-label="Switch between dark, light, and mystical themes" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors text-sm">
+                    🎨 Theme
+                </button>
+            </div>
             <p class="text-purple-200">Mystical lottery experience with cryptographic randomness</p>
         </div>
 
@@ -145,10 +210,10 @@
                 <div class="text-center mb-6">
                     <h2 class="text-xl font-semibold mb-4">🃏 Card Draw</h2>
                     <div class="flex gap-2 justify-center">
-                        <button onclick="drawCards()" class="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 rounded-lg transition-all transform hover:scale-105">
+                        <button onclick="drawCards()" aria-label="Draw 6 mystical cards to generate lottery numbers" class="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 rounded-lg transition-all transform hover:scale-105">
                             Draw 6 Cards
                         </button>
-                        <button onclick="runSimulation()" class="px-6 py-2 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 rounded-lg transition-all transform hover:scale-105">
+                        <button onclick="runSimulation()" aria-label="Run Monte Carlo simulation with 500 card draws" class="px-6 py-2 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 rounded-lg transition-all transform hover:scale-105">
                             Run Simulation
                         </button>
                     </div>
@@ -181,6 +246,7 @@
                     <div id="oracleSteps" class="text-center text-sm text-purple-200">
                         Draw cards to reveal your mystical number
                     </div>
+                    <div id="numerologyMeaning"></div>
                 </div>
 
                 <!-- Powerball Numbers -->
@@ -225,6 +291,19 @@
     </div>
 
     <script>
+        // Numerology meanings for digital roots
+        const numerologyMeanings = {
+            1: "New Beginnings - Leadership, independence, and pioneering spirit. A time to start fresh.",
+            2: "Cooperation - Partnership, diplomacy, and balance. Seek harmony in relationships.",
+            3: "Creativity - Artistic expression, communication, and joy. Let your creative spirit shine.",
+            4: "Stability - Hard work, organization, and building foundations. Focus on practical matters.",
+            5: "Freedom - Adventure, change, and versatility. Embrace new experiences and opportunities.",
+            6: "Nurturing - Family, home, and responsibility. Care for others and create harmony.",
+            7: "Spirituality - Introspection, wisdom, and mystical insights. Trust your inner knowing.",
+            8: "Material Success - Ambition, business acumen, and achievement. Focus on material goals.",
+            9: "Completion - Humanitarianism, wisdom, and endings. Share your gifts with the world."
+        };
+
         // Global state management
         const gameState = {
             currentDraw: [],
@@ -240,6 +319,35 @@
             '♠': 'Swords',
             '♣': 'Wands'
         };
+
+        // Display numerology meaning for digital root
+        function showNumerology(root) {
+            const meaning = numerologyMeanings[root];
+            if (meaning) {
+                const numerologyDiv = document.getElementById('numerologyMeaning');
+                if (numerologyDiv) {
+                    numerologyDiv.innerHTML = `
+                        <div class="mt-4 p-4 bg-yellow-900/30 rounded-lg border border-yellow-600/50">
+                            <h4 class="text-lg font-semibold text-yellow-400 mb-2">✨ Numerological Meaning</h4>
+                            <p class="text-yellow-200 text-sm">${meaning}</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Theme switcher function
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme') || 'dark';
+            const themes = ['dark', 'light', 'mystical'];
+            const currentIndex = themes.indexOf(currentTheme);
+            const nextIndex = (currentIndex + 1) % themes.length;
+            const nextTheme = themes[nextIndex];
+            
+            body.setAttribute('data-theme', nextTheme);
+            localStorage.setItem('cardDraw8Theme', nextTheme);
+        }
 
         // Cryptographically secure random number generator
         function secureRandom(max) {
@@ -479,6 +587,8 @@
                         oracleSteps.textContent = `Sum: ${step}`;
                     } else if (stepIndex === steps.length - 1) {
                         oracleSteps.textContent = `Digital Root: ${step}`;
+                        // Show numerology meaning after final step
+                        setTimeout(() => showNumerology(step), 500);
                     } else {
                         const digits = step.toString().split('').join(' + ');
                         oracleSteps.textContent = `${digits} = ${steps[stepIndex + 1]}`;
@@ -874,6 +984,12 @@
                 document.getElementById('oracleOrb').textContent = '?';
                 document.getElementById('oracleSteps').textContent = 'Draw cards to reveal your mystical number';
                 
+                // Clear numerology meaning
+                const numerologyDiv = document.getElementById('numerologyMeaning');
+                if (numerologyDiv) {
+                    numerologyDiv.innerHTML = '';
+                }
+                
                 // Clear powerball numbers
                 document.getElementById('powerballs-numbers').innerHTML = '';
             }
@@ -888,6 +1004,10 @@
 
         // Initialize the application
         function init() {
+            // Load saved theme
+            const savedTheme = localStorage.getItem('cardDraw8Theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            
             displaySuitOrder();
             updateDisplay();
             
