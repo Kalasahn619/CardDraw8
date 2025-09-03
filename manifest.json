@@ -2,7 +2,7 @@
     "name": "CardDraw8 – Random Luck",
     "short_name": "CardDraw8",
     "description": "Mystical lottery experience with cryptographic randomness",
-    "start_url": "./",
+    "start_url": "/index.html",
     "display": "standalone",
     "background_color": "#1e1b4b",
     "theme_color": "#7c3aed",
@@ -57,4 +57,5 @@
         ]
       }
     ]
+
   }
